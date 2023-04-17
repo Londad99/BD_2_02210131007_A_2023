@@ -1,0 +1,129 @@
+Punto 1
+CREATE OR REPLACE
+ALGORITHM = UNDEFINED VIEW `parque_diversiones`.`Beneficio_maquinas` AS
+select
+    `m`.`nombre` AS `Maquina`,
+    `rp`.`inicio_juego` AS `Día_de_uso`,
+    count(`rp`.`fecha_hora`) AS `Uso_por_Dia`,
+    sum(`rp`.`saldo_utilizado`) AS `Ganancia`
+from
+    (`parque_diversiones`.`maquina` `m`
+join `parque_diversiones`.`registro_partida` `rp` on
+    (`rp`.`id_maquina` = `m`.`id`))
+where
+    `m`.`estado` = 'Funcionando'
+group by
+    `m`.`nombre`
+order by
+    `rp`.`fecha_hora`,
+    sum(`rp`.`saldo_utilizado`),
+    count(`rp`.`fecha_hora`);
+Punto 2
+CREATE OR REPLACE
+ALGORITHM = UNDEFINED VIEW `parque_diversiones`.`Preferencias_usuarios` AS
+select
+    `u`.`nombre` AS `nombre`,
+    timestampdiff(YEAR,
+    `u`.`fecha_nacimiento`,
+    curdate()) AS `Edad`,
+    `u`.`id_genero` AS `genero`,
+    `m`.`nombre` AS `Maquina_usada`,
+    `rp`.`fecha_hora` AS `Dia_uso`
+from
+    ((`parque_diversiones`.`usuario` `u`
+join `parque_diversiones`.`registro_partida` `rp` on
+    (`rp`.`id_usuario` = `u`.`id`))
+join `parque_diversiones`.`maquina` `m` on
+    (`m`.`id` = `rp`.`id_maquina`))
+where
+    `m`.`estado` = 'Funcionando'
+order by
+    timestampdiff(YEAR,
+    `u`.`fecha_nacimiento`,
+    curdate()) desc,
+    `m`.`nombre`;
+Punto 3
+CREATE VIEW usuarios_nuevos_por_mes AS
+SELECT YEAR(tarjeta.fecha_emision) AS Año, MONTH(tarjeta.fecha_emision) AS Mes, COUNT(DISTINCT tarjeta.id_usuario) AS usuarios_nuevos
+FROM tarjeta
+LEFT JOIN recibo ON tarjeta.id = recibo.id
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM tarjeta t2
+  WHERE t2.id_usuario = tarjeta.id_usuario AND t2.fecha_emision < tarjeta.fecha_emision
+)
+AND recibo.id IS NOT NULL
+GROUP BY YEAR(tarjeta.fecha_emision), MONTH(tarjeta.fecha_emision);
+Punto 4
+CREATE VIEW usuarios_recurrentes_por_mes AS
+SELECT YEAR(recibo.fecha_hora) AS Año, MONTH(recibo.fecha_hora) AS Mes, COUNT(DISTINCT usuario.id) AS usuarios_recurrentes
+FROM usuario
+JOIN tarjeta ON usuario.id = tarjeta.id_usuario
+JOIN recibo ON tarjeta.id = recibo.id
+WHERE EXISTS (
+  SELECT 1
+  FROM recibo r2
+  WHERE r2.id_usuario = usuario.id AND YEAR(r2.fecha_hora) = YEAR(recibo.fecha_hora) AND MONTH(r2.fecha_hora) = MONTH(recibo.fecha_hora)
+  GROUP BY r2.id_usuario, YEAR(r2.fecha_hora), MONTH(r2.fecha_hora)
+  HAVING COUNT(DISTINCT MONTH(r2.fecha_hora)) >= 2
+)
+GROUP BY YEAR(recibo.fecha_hora), MONTH(recibo.fecha_hora);
+Punto 5
+CREATE VIEW ganancias_por_dia AS
+SELECT YEAR(recibo.fecha_hora) AS Año, MONTH(recibo.fecha_hora) AS Mes, DAY(recibo.fecha_hora) AS Dia, SUM(recibo.monto) - SUM(salario.salario/30) AS ganancias_totales
+FROM recibo
+INNER JOIN empleado ON recibo.id_empleado  = empleado.id
+INNER JOIN salario ON empleado.id = empleado.id
+GROUP BY YEAR(recibo.fecha_hora), MONTH(recibo.fecha_hora), DAY(recibo.fecha_hora);
+Punto 6 
+CREATE VIEW Ganancia_Maquina_Dia AS
+SELECT 
+  DATE(r.fecha_hora) as fecha,
+  m.nombre as nombre_maquina,
+  SUM(r.saldo_utilizado) as ganancia_maquina,
+  (SUM(r.saldo_utilizado) / ganancia_total_diaria.ganancia_total) * 100 as porcentaje_ganancia
+FROM registro_partida r
+JOIN maquina m ON m.id = r.id_maquina
+JOIN (
+  SELECT DATE(fecha_hora) as fecha, SUM(saldo_utilizado) as ganancia_total
+  FROM registro_partida
+  GROUP BY DATE(fecha_hora)
+) as ganancia_total_diaria ON ganancia_total_diaria.fecha = DATE(r.fecha_hora)
+GROUP BY DATE(r.fecha_hora), m.nombre, ganancia_total_diaria.ganancia_total;
+Punto 7
+CREATE VIEW usuarios_nuevos_recurrentes_dia AS 
+SELECT 
+    DATE(tarjeta.fecha_emision) AS fecha,
+    COUNT(DISTINCT usuario.id) AS nuevos,
+    COUNT(DISTINCT usuario_recurrente.id) AS recurrentes,
+    COUNT(DISTINCT usuario.id) * 100 / COUNT(DISTINCT usuario.id) AS porcentaje_nuevos,
+    COUNT(DISTINCT usuario_recurrente.id) * 100 / COUNT(DISTINCT usuario.id) AS porcentaje_recurrentes
+FROM 
+    usuario
+    LEFT JOIN tarjeta ON usuario.id = tarjeta.id_usuario
+    LEFT JOIN recibo ON usuario.id = recibo.id_usuario
+    LEFT JOIN (
+        SELECT 
+            usuario.id
+        FROM 
+            usuario
+            INNER JOIN tarjeta ON usuario.id = tarjeta.id_usuario
+            INNER JOIN recibo ON usuario.id = recibo.id_usuario
+        WHERE 
+            DATE(tarjeta.fecha_emision) = DATE(recibo.fecha_hora)
+        GROUP BY 
+            usuario.id, DATE(tarjeta.fecha_emision)
+        HAVING 
+            COUNT(DISTINCT DATE(tarjeta.fecha_emision)) >= 1
+    ) AS usuario_recurrente ON usuario.id = usuario_recurrente.id
+GROUP BY 
+    DATE(tarjeta.fecha_emision)
+ORDER BY 
+    DATE(tarjeta.fecha_emision) ASC;
+Punto 8
+CREATE VIEW ganancias_por_mes AS
+SELECT YEAR(recibo.fecha_hora) AS Año, MONTH(recibo.fecha_hora) AS Mes, SUM(recibo.monto) - SUM(salario.salario) AS ganancias_totales
+FROM recibo
+INNER JOIN empleado ON recibo.id_empleado  = empleado.id
+INNER JOIN salario ON empleado.id = empleado.id
+GROUP BY YEAR(recibo.fecha_hora), MONTH(recibo.fecha_hora);
