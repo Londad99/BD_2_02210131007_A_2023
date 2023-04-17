@@ -12,3 +12,5 @@ Taller_5 https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Consulta_
 Taller_6 https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Consultas_2_SGBDD_Angel_Caceres_.pdf
 
 Taller_7 https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Consultas_Universidad.docx
+
+parcial_vistas https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Creacion%20de%20vistas.txt
