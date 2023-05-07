@@ -16,3 +16,5 @@ Taller_7 https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Consultas
 parcial_vistas https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Creacion%20de%20vistas.txt
 
 Taller_8 https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Jardineria_consultas.pdf
+
+Taller_9 https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Universidad_2_Consultas.pdf
