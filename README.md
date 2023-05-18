@@ -19,4 +19,4 @@ Taller_8 https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Jardineri
 
 Taller_9 https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Universidad_2_Consultas.pdf
 
-Tallet_Final https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Consultas_gestion_Angel_Caceres.pdf
+Taller_Final https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Consultas_gestion_Angel_Caceres.pdf
