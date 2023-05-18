@@ -18,3 +18,5 @@ parcial_vistas https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Cre
 Taller_8 https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Jardineria_consultas.pdf
 
 Taller_9 https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Universidad_2_Consultas.pdf
+
+Tallet_Final https://github.com/Londad99/BD_2_02210131007_A_2023/blob/main/Consultas_gestion_Angel_Caceres.pdf
